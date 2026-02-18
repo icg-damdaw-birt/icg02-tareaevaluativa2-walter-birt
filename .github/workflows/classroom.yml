@@ -1,0 +1,30 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Verificar Contenido (Bio + Hobbies)
+      id: verificar-contenido-bio-hobbies
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Verificar Contenido (Bio + Hobbies)
+        setup-command: ''
+        command: grep -i "Sobre Mí" index.html && grep -i "Hobbies" index.html
+        timeout: 1
+        max-score: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        VERIFICAR-CONTENIDO-BIO-HOBBIES_RESULTS: "${{steps.verificar-contenido-bio-hobbies.outputs.result}}"
+      with:
+        runners: verificar-contenido-bio-hobbies
